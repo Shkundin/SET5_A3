@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+project(a3_hll CXX)
+set(CMAKE_CXX_STANDARD 17)
+add_executable(a3_hll src/main.cpp)
+target_include_directories(a3_hll PRIVATE include)
