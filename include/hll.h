@@ -1,8 +1,21 @@
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
 #pragma once
 #include <vector>
 #include <cstdint>
 #include <cmath>
 #include <limits>
+static inline uint32_t clz32(uint32_t x) {
+#ifdef _MSC_VER
+    if (x == 0) return 32;
+    unsigned long idx;
+    _BitScanReverse(&idx, x);
+    return 31u - static_cast<uint32_t>(idx);
+#else
+    return x ? static_cast<uint32_t>(clz32(x)) : 32u;
+#endif
+}
 
 class HyperLogLog32 {
     int B;
@@ -19,7 +32,7 @@ public:
     void add(std::uint32_t x){
         std::uint32_t idx = x>>(32-B);
         std::uint32_t w = x<<B;
-        int rho = w? (__builtin_clz(w)+1) : (32-B+1);
+        int rho = w? (clz32(w)+1) : (32-B+1);
         std::uint8_t v = (std::uint8_t)rho;
         if(v>M[idx]) M[idx]=v;
     }
@@ -87,7 +100,7 @@ public:
     void add(std::uint32_t x){
         std::uint32_t idx = x>>(32-B);
         std::uint32_t w = x<<B;
-        int rho = w? (__builtin_clz(w)+1) : (32-B+1);
+        int rho = w? (clz32(w)+1) : (32-B+1);
         std::uint8_t cur = get(idx);
         std::uint8_t v = (std::uint8_t)rho;
         if(v>cur) set(idx,v);
